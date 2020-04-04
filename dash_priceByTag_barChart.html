@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="./css/Chart.css">
+    <link rel="stylesheet" type="text/css" href="./css/customChart.css">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+    <script src="./js/Chart.min.js"></script>
+    <script src="./js/jquery-3.4.1.min.js"></script>
+    <script src="./chart.js/samples/utils.js"></script>
+    <script src="./js/utils.js"></script>
+    <title>chart.js Test</title>
+   </head>
+<body>
+
+<div class="chart-container" style=" height:193px; width:490px;border: 1px dashed #bcbcbc;">
+    <canvas id="monthlyBarChart" ></canvas>
+    <br>
+    <br>
+    <button id="randomizeData">데이터 갱신</button>
+</div>
+
+    <script>
+        // @todo 1. 툴팁 label 한픽셀 위로.
+        //
+        var totalDataNum = 0;
+        var labelArr = [];
+        var priceArr = [];
+        var perArr = [];
+        var colorsArr = [];
+        var totalPrice = 0;
+
+        var config = null;
+        // API 애서 받은 데이어 여기에 대입
+        var chartData = {};
+
+        // 데이터셋 랜덤으로 뿌리기
+        function randomDataset(){
+            return (Samples.utils.rand(100, 200));
+        }
+        // API 에서 받은 데이터를 Chart에 넣을 데이터로 변환.
+        function setChartData(dataObj){
+            totalDataNum = 5;
+            labelArr = new Array(totalDataNum);
+            perArr = new Array(totalDataNum);
+            priceArr = new Array(totalDataNum);
+            for(var i=0; i<totalDataNum; i++) {
+                labelArr[i] = "Environment"+(i+1);
+                priceArr[i] = randomDataset();
+                colorsArr[i] = Common.utils.getRandomColor();
+                totalPrice += priceArr[i];
+            }
+            for(var i=0; i<totalDataNum; i++) {
+                perArr[i] = Math.round((priceArr[i]/totalPrice)*100);
+            }
+        }
+
+        function setChartConfig(){
+            config = {
+                type: 'horizontalBar',
+                data: {
+                    labels: labelArr,
+                    datasets: [{
+                        backgroundColor: colorsArr,
+                        barThickness: 12,
+                        data: perArr
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    legend: {
+                        display:false
+                    },
+                    // Elements options apply to all of the options unless overridden in a dataset
+                    // In this case, we are setting the border of each horizontal bar to be 2px wide
+                    elements: {
+                        rectangle: {
+                            borderWidth: 2,
+                        }
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines : {
+                            display : false
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines : {
+                            display : false
+                        }
+                    }]
+                }
+            }
+        }
+
+        function init(){
+            setChartData();
+            setChartConfig();
+            Chart.defaults.global.defaultFontFamily = "Open Sans";
+            window.monthlyBarChart = new Chart(monthlyBarChart, config);
+            setButtons();
+        }
+        // 필요 없는 부분.
+        function setButtons(){
+            $('#randomizeData').on('click', function() {
+                config.data.datasets.forEach(function(dataset) {
+                    dataset.data = dataset.data.map(function() {
+                        return randomDataset();
+                    });
+                });
+                window.monthlyBarChart.update();
+            });
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>

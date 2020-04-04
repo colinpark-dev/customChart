@@ -1,0 +1,46 @@
+
+/*
+디자인에 맞추기 위한 커스텀 css
+ */
+.doughnut-custom-legend li span{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 7px;
+    border-radius: 4px;
+}
+
+.doughnut-custom-legend{
+    height:350px;
+    overflow:auto;
+}
+.doughnut-custom-legend ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 0px;
+    margin: 0;
+    padding: 0px;
+    padding-top: 7px;
+    padding-left: 4px;
+}
+.doughnut-custom-legend li{
+    cursor:pointer;
+    list-style: none;
+    font-family: "Open Sans";
+    font-size: 14px;
+    padding: 2px;
+    padding-left: 1px;
+    color : #555555;
+}
+
+.strike{
+    text-decoration: line-through !important;
+}
+
+.float-left{
+    float:left;
+}
