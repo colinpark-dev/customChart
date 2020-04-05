@@ -1,62 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="./css/Chart.css">
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
-    <script src="./js/Chart.min.js"></script>
-    <script src="./js/jquery-3.4.1.min.js"></script>
-    <script src="./chart.js/samples/utils.js"></script>
-    <title>chart.js Test</title>
-   </head>
-<body>
-<div class="" style="position: relative; height:218px; width:751px;border: 1px dashed #bcbcbc;">
-    <canvas id="" ></canvas>
-    <br>
-    <br>
-</div>
-<div class="chart-container" style="position: relative; height:218px; width:751px;border: 1px dashed #bcbcbc;">
-    <canvas id="monthlyLineChart" ></canvas>
-    <br>
-    <br>
-    <button id="randomizeData">데이터 갱신</button>
-</div>
-    <script>
+var chart = chart || {};
+
+(function() {
+    chart.dashLineChart = function () {
         //@todo 1. 전체적으로 약2픽셀 아래로 와야함.
         //@todo 2. 툴팁 label 한픽셀 위로
-        var totalDays = 0;
+        var chartObj = null;
+        var config = null;
         var labelArr = [];
         var priceArr = [];
         var dateArr = [];
 
-        var config = null;
-        // API 애서 받은 데이어 여기에 대입
-        var chartData = {};
-
-        //utils
-        // 데이터셋 랜덤으로 뿌리기
-        function randomDataset(){
-            return (Samples.utils.rand(100, 200));
-        }
-        // 숫자 앞에 0붙이기.
-        function pad(n, width) {
-            n = n + '';
-            return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
-        }
-
         // API 에서 받은 데이터를 Chart에 넣을 데이터로 변환.
-        function setChartData(dataObj){
-            totalDays = 30;
-            labelArr = new Array(totalDays);
-            dateArr = new Array(totalDays);
-            priceArr = new Array(totalDays);
-            for(var i=0; i<totalDays; i++) {
-                labelArr[i] = "Day"+(i+1);
-                dateArr[i] = "03."+pad(i+1,2);
-                priceArr[i] = randomDataset();
-            }
-        }
+        function parseData(dataObj){
+            labelArr = dataObj.labelArr;
+            dateArr = dataObj.dateArr;
+            priceArr = dataObj.priceArr;
+        };
+
         // 속성 정의
         function setChartConfig(){
             // 차트 속성 정의
@@ -80,7 +40,7 @@
                     tooltips: {
                         mode: 'index',
                         intersect: false, // 그리드라인 오버시 툴팁 나오게
-                        backgroundColor: "#15283b",
+                        backgroundColor: '#15283b',
                         yAlign: 'top',
                         xAlign: 'center',
                         bodyAlign: 'center',
@@ -89,21 +49,21 @@
                         yPadding : 8,
                         xPadding : 8,
                         custom: function(tooltip) {
-                            if (!tooltip) return;
+                            if (!tooltip) {return}
                             // 툴팁에 앞 박스 안나오게
                             tooltip.displayColors = false;
                         },
                         callbacks: {
-                            title: function(tooltipItem, data) {
-                                return ;
+                            title: function() {
+                                return '';
                             },
                             label: function(tooltipItem, data) {
-                                var label = data.datasets[tooltipItem.datasetIndex].label || '';
-
-                                label = Math.round(tooltipItem.yLabel * 100) / 100;
-                                return dateArr[tooltipItem.index]+"  "+"$"+label;
+                                var label =
+                                    data.datasets[tooltipItem.datasetIndex].label ||
+                                    Math.round(tooltipItem.yLabel * 100) / 100;
+                                return dateArr[tooltipItem.index]+'  $'+label;
                             },
-                            labelTextColor: function(tooltipItem, chart) {
+                            labelTextColor: function() {
                                 return '#ffffff';
                             }
                         }
@@ -115,7 +75,6 @@
                                 drawOnChartArea: false,
                                 drawTicks : false
                             },
-
                             ticks: {
                                 maxTicksLimit : 100,
                                 fontSize : 14,
@@ -129,15 +88,15 @@
                                     // 말일이 10으로 안떨어지는 달
                                     // 말일이 10으로 나눈 초과일떄,
                                     if(data.length > period*10){
-                                        if((index+1)==period*10) returnLabel = '';
-                                        if((index+1)==data.length) returnLabel = dataLabel;
+                                        if(Number(index+1)===period*10) {returnLabel = ''}
+                                        if(Number(index+1)===data.length) {returnLabel = dataLabel}
                                     }else{
                                         // 10으로 나눈 미만일대,
-                                        if((index+1)==data.length){
+                                        if(Number(index+1)===data.length){
                                             returnLabel = dataLabel;
                                         }
                                     }
-                                    if(index==0)returnLabel = dataLabel;
+                                    if(index===0){returnLabel = dataLabel}
                                     return returnLabel;
                                 }
                             }
@@ -161,8 +120,9 @@
                         }]
                     }
                 }
-            };
-        }
+            }
+        };
+
         // 마우스 오버시 가이드라인 표시.
         function setLineWithLine(){
             Chart.defaults.LineWithLine = Chart.defaults.line;
@@ -170,12 +130,12 @@
                 draw: function(ease) {
                     Chart.controllers.line.prototype.draw.call(this, ease);
                     if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
+                        // eslint-disable-next-line vars-on-top
                         var activePoint = this.chart.tooltip._active[0],
-                            ctx = this.chart.ctx,
-                            x = activePoint.tooltipPosition().x,
-                            topY = this.chart.scales['y-axis-0'].top,
-                            bottomY = this.chart.scales['y-axis-0'].bottom;
-
+                        ctx = this.chart.ctx,
+                        x = activePoint.tooltipPosition().x,
+                        topY = this.chart.scales['y-axis-0'].top,
+                        bottomY = this.chart.scales['y-axis-0'].bottom;
                         // draw line
                         ctx.save();
                         ctx.beginPath();
@@ -187,48 +147,30 @@
                         ctx.restore();
                     }
                 }
-            });
-        }
-        function init(){
-            setChartData(chartData);
+            })
+        };
+
+        // 캔버스 동적 생성
+        function createCanvas(canvasEl){
+            canvasEl.append('<canvas style="position: relative;"></canvas>');
+        };
+
+        // public 업데이트
+        this.update = function(chartData){
+            parseData(chartData);
+            config.data.labels = labelArr;
+            config.data.datasets[0].data = priceArr;
+            chartObj.update();
+        };
+
+        // public 초기화
+        this.init = function(canvasEl, chartData) {
+            createCanvas(canvasEl);
+            parseData(chartData);
             setChartConfig();
             setLineWithLine();
-            Chart.defaults.global.defaultFontFamily = "Open Sans";
-            window.monthlyLineChart = new Chart(monthlyLineChart, config);
-            setButtons();
-        }
-        // 필요 없는 부분.
-        function setButtons(){
-            $('#randomizeData').on('click', function() {
-                config.data.datasets.forEach(function(dataset) {
-                    dataset.data = dataset.data.map(function() {
-                        return randomDataset();
-                    });
-                });
-                window.monthlyLineChart.update();
-            });
-            $('#addData').on('click', function() {
-                if (config.data.datasets.length > 0) {
-                    var labelText = "Day "+(labelArr.length+1);
-                    config.data.labels.push(labelText);
-
-                    config.data.datasets.forEach(function(dataset) {
-                        dataset.data.push(randomDataset());
-                    });
-                    window.monthlyLineChart.update();
-                }
-            });
-            $('#removeData').on('click', function() {
-                config.data.labels.splice(-1, 1); // remove the label first
-
-                config.data.datasets.forEach(function(dataset) {
-                    dataset.data.pop();
-                });
-
-                window.monthlyLineChart.update();
-            });
-        }
-        window.onload = init;
-    </script>
-</body>
-</html>
+            chartObj = new Chart(canvasEl.children('canvas'), config);
+            Chart.defaults.global.defaultFontFamily = 'Open Sans';
+        };
+    };
+})();
