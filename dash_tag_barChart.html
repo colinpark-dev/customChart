@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="./css/Chart.css">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+    <script src="./js/Chart.min.js"></script>
+    <script src="./js/jquery-3.4.1.min.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/dashBarChart.js"></script>
+    <title>대시보드-상품별 이용현황 차트</title>
+   </head>
+<body>
+
+<div id="chartContainer" class="chart-container" style=" height:193px; width:490px;border: 1px dashed #bcbcbc;">
+</div>
+<br>
+<br>
+<button id="randomizeData">데이터 갱신</button>
+
+    <script>
+        // @todo 1. 툴팁 label 한픽셀 위로.
+
+        var lineChart = null;
+
+        // 데이터 랜덤으로 생성.
+        function generateData(){
+            var totalDataNum = 5+Math.round(Math.random() * 15);
+            var totalPrice = 0;
+            var chartData = {};
+            chartData.labelArr = [];
+            chartData.perArr = [];
+            chartData.priceArr = [];
+            chartData.colorsArr = [];
+            for(var i=0; i<totalDataNum; i++) {
+                chartData.labelArr.push('Environment' + (i + 1));
+                chartData.priceArr.push(Common.utils.rand(100, 200));
+                chartData.colorsArr.push(Common.utils.getRandomColor());
+                totalPrice += chartData.priceArr[i];
+            }
+            for(var j=0; j<totalDataNum; j++) {
+                chartData.perArr.push(Math.round((chartData.priceArr[j]/totalPrice)*100));
+            }
+            return chartData;
+        };
+
+        // 필요 없는 부분
+        function setButtons(){
+            $('#randomizeData').on('click', function() {
+                lineChart.update(generateData());
+            });
+        };
+
+        function init(){
+            setButtons();
+            lineChart = new chart.dashLineChart();
+            lineChart.init($('#chartContainer'), generateData());
+        };
+
+        window.onload = init;
+    </script>
+</body>
+</html>

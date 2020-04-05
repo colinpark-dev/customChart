@@ -6,108 +6,14 @@
     <link rel="stylesheet" type="text/css" href="./css/Chart.css">
     <script src="./js/Chart.min.js"></script>
     <script src="./js/jquery-3.4.1.min.js"></script>
-    <title>test</title>
+    <title>colinpark.dev - customChart</title>
 </head>
 <body>
 <div class="container" style="width: 100%;margin-top:30px;">
+    테스트 중.
     <canvas id="myChart"></canvas>
 </div>
 <script>
-
-    function set(){
-        console.log("new : ", chartO);
-        Chart.defaults.LineWithLine = Chart.defaults.line;
-        Chart.controllers.LineWithLine = Chart.controllers.line.extend({
-            draw: function(ease) {
-                Chart.controllers.line.prototype.draw.call(this, ease);
-                console.log("event : ",this);
-
-                if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
-                    var activePoint = this.chart.tooltip._active[0],
-                        ctx = this.chart.ctx,
-                        x = activePoint.tooltipPosition().x,
-                        topY = this.chart.scales['y-axis-0'].top,
-                        bottomY = this.chart.scales['y-axis-0'].bottom;
-
-                    // draw line
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.moveTo(x, topY);
-                    ctx.lineTo(x, bottomY);
-                    ctx.lineWidth = 4;
-                    ctx.strokeStyle = '#757575';
-                    ctx.stroke();
-                    ctx.restore();
-                }
-            }
-        });
-    }
-
-
-
-    set();
-    var chartO = new Chart("myChart", {
-        type: 'LineWithLine',
-        data: {
-            labels: ['20/09/2017',
-                '20/10/2017',
-                '20/11/2017',
-                '20/12/2017'
-            ],
-            datasets: [{
-                label: 'US Dollar',
-                fill: false,
-                lineTension: 0,
-                data: [123, 143, 156, 122],
-                pointBackgroundColor: '#f90',
-                pointHoverBackgroundColor: '#fff',
-                //backgroundColor:'green',
-                backgroundColor: ['#2277bb', '#2277bb', '#2277bb', '#000000', ],
-                borderWidth: 3,
-                borderColor: '#f90',
-                hoverBorderWidth: 3,
-                hoverBorderColor: '#fff'
-            }]
-        },
-        options: {
-            title: {
-                display: true,
-                text: 'Chart 1',
-                fontSize: 16
-            },
-            legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                    fontColor: '#000'
-                }
-            },
-            layout: {
-                padding: {
-                    left: 50,
-                    right: 0,
-                    bottom: 0,
-                    top: 0
-                }
-            },
-            tooltips: {
-                enabled: true,
-                intersect: false
-            },
-            elements: {
-                point: {
-                    radius: 5
-                }
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            },
-        }
-    });
 </script>
 </body>
 </html>
