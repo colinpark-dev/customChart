@@ -13,20 +13,23 @@
    </head>
 <body>
 
-<div id="chartContainer" class="chart-container" style=" height:193px; width:490px;border: 1px dashed #bcbcbc;">
+<div id="" style="height:175px; width:490px;  overflow:auto;">
+    <div id="chartContainer" style="height:175px; width:490px; display: block">
+    </div>
 </div>
-<br>
+<div id="axisContainer" style="height:50px; width:490px; display: block">
+</div>
 <br>
 <button id="randomizeData">데이터 갱신</button>
 
     <script>
         // @todo 1. 툴팁 label 한픽셀 위로.
 
-        var lineChart = null;
+        var chartObj = null;
 
         // 데이터 랜덤으로 생성.
         function generateData(){
-            var totalDataNum = 5+Math.round(Math.random() * 15);
+            var totalDataNum = 5 + Math.round(Math.random() * 15);
             var totalPrice = 0;
             var chartData = {};
             chartData.labelArr = [];
@@ -35,7 +38,7 @@
             chartData.colorsArr = [];
             for(var i=0; i<totalDataNum; i++) {
                 chartData.labelArr.push('Environment' + (i + 1));
-                chartData.priceArr.push(Common.utils.rand(100, 200));
+                chartData.priceArr.push(Common.utils.rand(0, 500));
                 chartData.colorsArr.push(Common.utils.getRandomColor());
                 totalPrice += chartData.priceArr[i];
             }
@@ -48,14 +51,14 @@
         // 필요 없는 부분
         function setButtons(){
             $('#randomizeData').on('click', function() {
-                lineChart.update(generateData());
+                chartObj.update(generateData());
             });
         };
 
         function init(){
             setButtons();
-            lineChart = new chart.dashLineChart();
-            lineChart.init($('#chartContainer'), generateData());
+            chartObj = new chart.dashLineChart();
+            chartObj.init($('#chartContainer'), generateData(),$('#axisContainer'));
         };
 
         window.onload = init;

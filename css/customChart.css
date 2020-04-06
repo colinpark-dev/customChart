@@ -1,6 +1,6 @@
 
 /*
-디자인에 맞추기 위한 커스텀 css
+대시보드 상품별 이용 현황 디자인에 맞추기 위한 커스텀 css
  */
 .doughnut-custom-legend li span{
     display: inline-block;
@@ -11,7 +11,6 @@
 }
 
 .doughnut-custom-legend{
-    height:350px;
     overflow:auto;
 }
 .doughnut-custom-legend ul {

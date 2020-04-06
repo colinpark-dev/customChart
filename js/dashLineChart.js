@@ -151,8 +151,8 @@ var chart = chart || {};
         };
 
         // 캔버스 동적 생성
-        function createCanvas(canvasEl){
-            canvasEl.append('<canvas style="position: relative;"></canvas>');
+        function createCanvas(containerEl){
+            containerEl.append('<canvas></canvas>');
         };
 
         // public 업데이트
@@ -164,13 +164,13 @@ var chart = chart || {};
         };
 
         // public 초기화
-        this.init = function(canvasEl, chartData) {
-            createCanvas(canvasEl);
+        this.init = function(containerEl, chartData) {
+            createCanvas(containerEl);
             parseData(chartData);
             setChartConfig();
             setLineWithLine();
-            chartObj = new Chart(canvasEl.children('canvas'), config);
+            chartObj = new Chart(containerEl.children('canvas'), config);
             Chart.defaults.global.defaultFontFamily = 'Open Sans';
         };
-    };
+    }
 })();

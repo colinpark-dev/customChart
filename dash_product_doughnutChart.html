@@ -14,8 +14,8 @@
 </head>
 <body>
 
-<div class="chart-container" style="position: relative; height:193px; width:490px; border: 1px dashed #bcbcbc;">
-    <div id="chartContainer" class="float-left" style="position: relative;width:182px;height:154px;padding: 22px;">
+<div class="chart-container" style="height:193px; width:490px; border: 1px dashed #bcbcbc;">
+    <div id="chartContainer" class="float-left" style="width:182px;height:154px;padding: 22px;">
 
     </div>
     <div class="doughnut-custom-legend float-left" style="width:264px; height:193px ">
@@ -28,7 +28,7 @@
 <button id="randomizeData">데이터 갱신</button>
 <script>
 
-    var lineChart = null;
+    var chartObj = null;
 
     // 데이터 랜덤으로 생성.
     function generateData(){
@@ -54,7 +54,7 @@
     // 필요 없는 부분
     function setButtons(){
         $('#randomizeData').on('click', function() {
-            lineChart.update(generateData());
+            chartObj.update(generateData());
         });
     };
 
@@ -62,9 +62,9 @@
         setButtons();
 
         // 차트 인스턴스 생성
-        lineChart = new chart.dashLineChart();
+        chartObj = new chart.dashLineChart();
         // 차트가 만들어질 div 객체, data를 넘겨줌
-        lineChart.init($('#chartContainer'), generateData(), $('#doughnutLegend'));
+        chartObj.init($('#chartContainer'), generateData(), $('#doughnutLegend'));
         //setLegend();
     };
     window.onload = init;

@@ -75,7 +75,6 @@ var chart = chart || {};
                             }else{
                                 tooltip.yAlign = 'bottom';
                             }
-
                         },
                         callbacks: {
                             title: function(tooltipItem, data) {
@@ -116,8 +115,8 @@ var chart = chart || {};
         };
 
         // 캔버스 동적 생성
-        function createCanvas(canvasEl){
-            canvasEl.append('<canvas style="position: relative;"></canvas>');
+        function createCanvas(containerEl){
+            containerEl.append('<canvas></canvas>');
         };
 
         // public 업데이트
@@ -130,12 +129,12 @@ var chart = chart || {};
         };
 
         // public 초기화
-        this.init = function(canvasEl, chartData, legendEl) {
+        this.init = function(containerEl, chartData, legendEl) {
             legendElObj = legendEl;
-            createCanvas(canvasEl);
+            createCanvas(containerEl);
             parseData(chartData);
             setChartConfig();
-            chartObj = new Chart(canvasEl.children('canvas'), config);
+            chartObj = new Chart(containerEl.children('canvas'), config);
             createLegend();
             Chart.defaults.global.defaultFontFamily = 'Open Sans';
         };

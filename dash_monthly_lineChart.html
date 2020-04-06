@@ -12,13 +12,13 @@
     <title>대시보드-이용금액 라인차트</title>
 </head>
 <body>
-<div id="chartContainer" class="chart-container" style="position: relative; height:218px; width:751px;border: 1px dashed #bcbcbc;">
+<div id="chartContainer" class="chart-container" style="height:218px; width:751px;border: 1px dashed #bcbcbc;">
 </div>
 <br>
 <br>
 <button id="randomizeData">데이터 갱신</button>
     <script>
-        var lineChart = null;
+        var chartObj = null;
 
         // 데이터 랜덤으로 생성.
         function generateData(){
@@ -38,14 +38,14 @@
         // 필요 없는 부분
         function setButtons(){
             $('#randomizeData').on('click', function() {
-                lineChart.update(generateData());
+                chartObj.update(generateData());
             });
         };
 
         function init(){
             setButtons();
-            lineChart = new chart.dashLineChart();
-            lineChart.init($('#chartContainer'), generateData());
+            chartObj = new chart.dashLineChart();
+            chartObj.init($('#chartContainer'), generateData());
         };
 
         window.onload = init;
