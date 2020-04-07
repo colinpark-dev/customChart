@@ -13,12 +13,14 @@ var chart = chart || {};
 
         // API 에서 받은 데이터를 Chart에 넣을 데이터로 변환.
         function parseData(dataObj){
+            labelArr = [];
             dateArr = dataObj.dateArr;
             priceArr = dataObj.priceArr;
             var _totalDays = Common.utils.getDays(dataObj.year,dataObj.month);
             for(var i=0; i<_totalDays; i++) {
                 labelArr.push('Day'+(i+1));
             }
+            console.log(labelArr);
         };
 
         // 속성 정의
