@@ -23,10 +23,12 @@ var chart = chart || {};
             colorsArr = [];
             var _totalNum = labelArr.length;
             for(var i=0; i<_totalNum; i++) {
-                if(i>standColor.length){
-                    colorsArr.push(Common.utils.getRandomColor());
-                }else{
+                if(i<standColor.length){
+                    console.log('안')
                     colorsArr.push(standColor[i%standColor.length]);
+                }else{
+                    console.log('랜덤')
+                    colorsArr.push(Common.utils.getRandomColor());
                 }
             }
 
