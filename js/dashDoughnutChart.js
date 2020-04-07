@@ -1,7 +1,7 @@
 var chart = chart || {};
 
 (function() {
-    chart.dashLineChart = function () {
+    chart.dashDoughnutChart = function () {
         //@todo 2. 툴팁 label 한픽셀 위로
         //@todo 2. 범례 동적 생성할지 고민.
         //@todo 2. 범례 오버시 툴팁 보이는 것 고민.
@@ -11,6 +11,7 @@ var chart = chart || {};
         var labelArr = [];
         var priceArr = [];
         var perArr = [];
+        var standColor = ['#394cb1', '#0078ee', '#15d4a9', '#f9bc5f', '#f98e5f', '#fd4d4d'];
         var colorsArr = [];
         var legendElObj = null;
 
@@ -19,7 +20,16 @@ var chart = chart || {};
             labelArr = dataObj.labelArr;
             perArr = dataObj.perArr;
             priceArr = dataObj.priceArr;
-            colorsArr = dataObj.colorsArr;
+            colorsArr = [];
+            var _totalNum = labelArr.length;
+            for(var i=0; i<_totalNum; i++) {
+                if(i>standColor.length){
+                    colorsArr.push(Common.utils.getRandomColor());
+                }else{
+                    colorsArr.push(standColor[i%standColor.length]);
+                }
+            }
+
         };
 
         // 속성 정의
@@ -124,6 +134,7 @@ var chart = chart || {};
             parseData(chartData);
             config.data.labels = labelArr;
             config.data.datasets[0].data = priceArr;
+            config.data.datasets[0].backgroundColor = colorsArr;
             createLegend();
             chartObj.update();
         };

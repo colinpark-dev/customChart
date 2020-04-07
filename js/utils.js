@@ -20,6 +20,11 @@
             this._seed = seed;
         },
 
+        getDays: function(year, month)
+        {
+            return 32 - new Date(year, month-1, 32).getDate();
+        },
+
         rand: function(min, max) {
             var seed = this._seed;
             min = min === undefined ? 0 : min;

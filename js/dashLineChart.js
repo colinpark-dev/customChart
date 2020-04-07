@@ -4,6 +4,7 @@ var chart = chart || {};
     chart.dashLineChart = function () {
         //@todo 1. 전체적으로 약2픽셀 아래로 와야함.
         //@todo 2. 툴팁 label 한픽셀 위로
+        //@todo 2. 해당월 전체 날짜 표기, 데이터 들어온것만 표시.
         var chartObj = null;
         var config = null;
         var labelArr = [];
@@ -12,9 +13,12 @@ var chart = chart || {};
 
         // API 에서 받은 데이터를 Chart에 넣을 데이터로 변환.
         function parseData(dataObj){
-            labelArr = dataObj.labelArr;
             dateArr = dataObj.dateArr;
             priceArr = dataObj.priceArr;
+            var _totalDays = Common.utils.getDays(dataObj.year,dataObj.month);
+            for(var i=0; i<_totalDays; i++) {
+                labelArr.push('Day'+(i+1));
+            }
         };
 
         // 속성 정의

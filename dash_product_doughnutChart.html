@@ -30,19 +30,19 @@
 
     var chartObj = null;
 
-    // 데이터 랜덤으로 생성.
-    function generateData(){
+    // 통신 응답 data 가공.
+    // 아래 Object로 변형해서 차트로 넘기면 됨.
+    // return {labelArr:[], perArr:[], priceArr:[]}
+    function reponseData(){
         var totalDataNum = 2 + Math.round(Math.random() * 13);
         var totalPrice = 0;
         var chartData = {};
         chartData.labelArr = [];
         chartData.perArr = [];
         chartData.priceArr = [];
-        chartData.colorsArr = [];
         for(var i=0; i<totalDataNum; i++) {
             chartData.labelArr.push('AWSDatabaseMigrationSvc'+(i+1));
             chartData.priceArr.push(Common.utils.rand(100, 200));
-            chartData.colorsArr.push(Common.utils.getRandomColor());
             totalPrice += chartData.priceArr[i];
         }
         for(var j=0; j<totalDataNum; j++) {
@@ -54,7 +54,7 @@
     // 필요 없는 부분
     function setButtons(){
         $('#randomizeData').on('click', function() {
-            chartObj.update(generateData());
+            chartObj.update(reponseData());
         });
     };
 
@@ -62,9 +62,9 @@
         setButtons();
 
         // 차트 인스턴스 생성
-        chartObj = new chart.dashLineChart();
+        chartObj = new chart.dashDoughnutChart();
         // 차트가 만들어질 div 객체, data를 넘겨줌
-        chartObj.init($('#chartContainer'), generateData(), $('#doughnutLegend'));
+        chartObj.init($('#chartContainer'), reponseData(), $('#doughnutLegend'));
         //setLegend();
     };
     window.onload = init;

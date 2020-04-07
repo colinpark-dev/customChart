@@ -20,15 +20,17 @@
     <script>
         var chartObj = null;
 
-        // 데이터 랜덤으로 생성.
-        function generateData(){
-            var totalDays = 28+Math.round(Math.random() * 3); // 28~31일 추출.
+        // 통신 응답 data 가공.
+        // 아래 Object로 변형해서 차트로 넘기면 됨.
+        // return {year:2020, month:3, perArr:[], priceArr:[]}
+        function reponseData(){
+            var totalDays = 23;//28+Math.round(Math.random() * 3); // 28~31일 추출.
             var chartData = {};
-            chartData.labelArr = [];
+            chartData.year = 2020;
+            chartData.month = 2;
             chartData.dateArr = [];
             chartData.priceArr = [];
             for(var i=0; i<totalDays; i++) {
-                chartData.labelArr.push('Day'+(i+1));
                 chartData.dateArr.push('03.'+Common.utils.getPad(i+1,2));
                 chartData.priceArr.push(Common.utils.rand(100, 200));
             }
@@ -38,14 +40,14 @@
         // 필요 없는 부분
         function setButtons(){
             $('#randomizeData').on('click', function() {
-                chartObj.update(generateData());
+                chartObj.update(reponseData());
             });
         };
 
         function init(){
             setButtons();
             chartObj = new chart.dashLineChart();
-            chartObj.init($('#chartContainer'), generateData());
+            chartObj.init($('#chartContainer'), reponseData());
         };
 
         window.onload = init;

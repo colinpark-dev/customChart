@@ -9,15 +9,16 @@
     <script src="./js/jquery-3.4.1.min.js"></script>
     <script src="./js/utils.js"></script>
     <script src="./js/dashBarChart.js"></script>
-    <title>대시보드-태그별 이용현황 차트</title>
+    <title>대시보드-지역별 이용현황 차트</title>
    </head>
 <body>
-
-<div id="" style="height:175px; width:490px;  overflow:auto;">
-    <div id="chartContainer" style="height:175px; width:490px; display: block">
+<div style="height:193px; width:490px; border: 1px dashed #bcbcbc;">
+    <div id="" style="height:173px; width:490px;  overflow:auto;">
+        <div id="chartContainer" style="height:175px; width:490px; display: block">
+        </div>
     </div>
-</div>
-<div id="axisContainer" style="height:50px; width:490px; display: block">
+    <div id="axisContainer" style="height:20px; width:490px; display: block">
+    </div>
 </div>
 <br>
 <button id="randomizeData">데이터 갱신</button>
@@ -36,7 +37,7 @@
             chartData.perArr = [];
             chartData.priceArr = [];
             for(var i=0; i<totalDataNum; i++) {
-                chartData.labelArr.push('Environment' + (i + 1));
+                chartData.labelArr.push('Country' + (i + 1));
                 chartData.priceArr.push(Common.utils.rand(0, 500));
                 totalPrice += chartData.priceArr[i];
             }
