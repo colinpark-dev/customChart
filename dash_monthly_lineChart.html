@@ -7,8 +7,8 @@
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
     <script src="./js/Chart.min.js"></script>
     <script src="./js/jquery-3.4.1.min.js"></script>
-    <script src="./js/utils.js"></script>
-    <script src="./js/dashLineChart.js"></script>
+    <script src="./js/utils.js?version=0.9"></script>
+    <script src="./js/dashLineChart.js?version=0.9"></script>
     <title>대시보드-이용금액 라인차트</title>
 </head>
 <body>
@@ -20,24 +20,34 @@
     <script>
         var chartObj = null;
 
-        // 통신 응답 data 가공.
-        // 아래 Object로 변형해서 차트로 넘기면 됨.
-        // return {year:2020, month:3, perArr:[], priceArr:[]}
+        // 데이터 통신 응답 data를 아래 Object로 변형해서 차트로 넘기면 됨.
+        // 현재 함수는 동적 데이터 생성.
+        /**
+         * {
+            year : 2020,
+            month : 3,
+            labelArr : [],
+            dataset : [
+                {title: '', dataArr:[]}
+            ]
+        }
+         */
         function reponseData(){
-            var totalDays = 23;//28+Math.round(Math.random() * 3); // 28~31일 추출.
-            var chartData = {};
-            chartData.year = 2020;
-            chartData.month = 2;
-            chartData.dateArr = [];
-            chartData.priceArr = [];
-            for(var i=0; i<totalDays; i++) {
-                chartData.dateArr.push('03.'+Common.utils.getPad(i+1,2));
-                chartData.priceArr.push(Common.utils.rand(100, 200));
+            var _totalNum = 10+Math.round(Math.random() * 21); // 28~31일 추출.
+            var _chartData = {};
+            _chartData.year = 2020;
+            _chartData.month = 3;
+            _chartData.labelArr = [];
+            _chartData.dataset = [{title : '', dataArr : []}];
+            for(var i=0; i<_totalNum; i++) {
+                _chartData.dataset[0].dataArr.push(Common.utils.rand(100, 200));
+                _chartData.labelArr.push('03.'+Common.utils.getPad(i+1,2));
             }
-            return chartData;
+            console.log(_chartData);
+            return _chartData;
         };
 
-        // 필요 없는 부분
+        // 각 버튼 정의
         function setButtons(){
             $('#randomizeData').on('click', function() {
                 chartObj.update(reponseData());
@@ -46,6 +56,7 @@
 
         function init(){
             setButtons();
+            // 차트생성, 데이터 넣기.
             chartObj = new chart.dashLineChart();
             chartObj.init($('#chartContainer'), reponseData());
         };

@@ -1,37 +1,70 @@
 var chart = chart || {};
 
 (function() {
-    chart.dashDoughnutChart = function () {
-        //@todo 2. 툴팁 label 한픽셀 위로
-        //@todo 2. 범례 동적 생성할지 고민.
-        //@todo 2. 범례 오버시 툴팁 보이는 것 고민.
-
+    chart.doughnutChart = function () {
         var chartObj = null;
         var config = null;
         var labelArr = [];
-        var priceArr = [];
         var perArr = [];
-        var standColor = ['#394cb1', '#0078ee', '#15d4a9', '#f9bc5f', '#f98e5f', '#fd4d4d'];
-        var colorsArr = [];
+        var dataSetsArr = [];
+        var chartColors = [
+            '#394cb1',
+            '#0078ee',
+            '#15d4a9',
+            '#f9bc5f',
+            '#f98e5f',
+            '#fd4d4d',
+            '#b5e021',
+            '#b139ad',
+            '#00e6ee',
+            '#6639b1',
+            '#e83a3a',
+            '#27ce66',
+            '#f26a57',
+            '#4139b1',
+            '#e9e222',
+            '#40e021',
+            '#8239b1',
+            '#d3249f',
+            '#00aeee'
+        ];
         var legendElObj = null;
 
         // API 에서 받은 데이터를 Chart에 넣을 데이터로 변환.
         function parseData(dataObj){
+            var _totalNum = dataObj.dataset.length;
+            var _totalLableNum = dataObj.dataset[0].dataArr.length;
+            var _totalPrice = 0;
+            var _colorArr = [];
+            dataSetsArr = [];
             labelArr = dataObj.labelArr;
-            perArr = dataObj.perArr;
-            priceArr = dataObj.priceArr;
-            colorsArr = [];
-            var _totalNum = labelArr.length;
-            for(var i=0; i<_totalNum; i++) {
-                if(i<standColor.length){
-                    console.log('안')
-                    colorsArr.push(standColor[i%standColor.length]);
+            perArr = [];
+
+            // 컬러 세팅
+            for(var i=0; i<labelArr.length; i++) {
+                if(i<chartColors.length){
+                    _colorArr.push(chartColors[i%chartColors.length]);
                 }else{
-                    console.log('랜덤')
-                    colorsArr.push(Common.utils.getRandomColor());
+                    _colorArr.push(Common.utils.getRandomColor());
                 }
             }
+            // 데이터 세팅.
+            for(var i = 0; i < _totalNum; i++){
+                var _item = {
+                    data: dataObj.dataset[i].dataArr,
+                    backgroundColor : _colorArr,
+                    borderWidth: 0
+                }
+                dataSetsArr.push(_item);
+            }
 
+            // 퍼센트 미리 구하기.
+            for(var j=0; j<_totalLableNum; j++) {
+                _totalPrice += dataObj.dataset[0].dataArr[j];
+            }
+            for(var k=0; k<_totalLableNum; k++) {
+                perArr.push(Math.round((dataObj.dataset[0].dataArr[k]/_totalPrice)*100));
+            }
         };
 
         // 속성 정의
@@ -41,11 +74,7 @@ var chart = chart || {};
                 type: 'doughnut',
 
                 data: {
-                    datasets: [{
-                        data: priceArr,
-                        backgroundColor: colorsArr,
-                        borderWidth: 0,
-                    }],
+                    datasets: dataSetsArr,
                     labels: labelArr
                 },
                 options: {
@@ -93,10 +122,9 @@ var chart = chart || {};
                                 return '';
                             },
                             label: function(tooltipItem, data) {
-                                var price = priceArr[tooltipItem.index] || '';
-
-                                price = Math.round(price * 100) / 100;
-                                return '$'+price+' ('+perArr[tooltipItem.index]+'%)';
+                                var _price = data.datasets[0].data[tooltipItem.index] || '';
+                                _price = Math.round(_price * 100) / 100;
+                                return '$'+_price+' ('+perArr[tooltipItem.index]+'%)';
                             },
                             labelTextColor: function(tooltipItem, chart) {
                                 return '#ffffff';
@@ -126,25 +154,19 @@ var chart = chart || {};
             });
         };
 
-        // 캔버스 동적 생성
-        function createCanvas(containerEl){
-            containerEl.append('<canvas></canvas>');
-        };
-
         // public 업데이트
         this.update = function(chartData){
             parseData(chartData);
             config.data.labels = labelArr;
-            config.data.datasets[0].data = priceArr;
-            config.data.datasets[0].backgroundColor = colorsArr;
-            createLegend();
+            config.data.datasets = dataSetsArr;
             chartObj.update();
+            createLegend();
         };
 
         // public 초기화
         this.init = function(containerEl, chartData, legendEl) {
             legendElObj = legendEl;
-            createCanvas(containerEl);
+            containerEl.append('<canvas></canvas>');
             parseData(chartData);
             setChartConfig();
             chartObj = new Chart(containerEl.children('canvas'), config);

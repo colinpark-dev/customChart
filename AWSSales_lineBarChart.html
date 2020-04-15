@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="./css/Chart.css">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+    <script src="./js/Chart.min.js"></script>
+    <script src="./js/jquery-3.4.1.min.js"></script>
+    <script src="./js/utils.js?version=0.9"></script>
+    <script src="./js/salesLineBarChart.js?version=0.9"></script>
+    <title>AWS 매출 추이 라인바차트</title>
+</head>
+<body>
+<div id="chartContainer" class="chart-container" style="height:268px; width:100%;border: 1px dashed #bcbcbc;">
+</div>
+<br>
+<br>
+<button id="monthlyRandom">데이터 갱신</button>
+    <script>
+        var chartObj = null;
+
+        var totalMonths = 0;
+        // 데이터 통신 응답 data를 아래 Object로 변형해서 차트로 넘기면 됨.
+        // 현재 함수는 동적 데이터 생성.
+        /**
+         * {
+            labelArr : [],
+            dataset : [
+                {title: '', dataArr:[]},
+                {title: '', dataArr:[]}
+            ]
+            }
+         */
+        function reponseByProductData(){
+            totalMonths = 8 + Math.round(Math.random() * 16);
+            var _totalProductNum = 2 + Math.round(Math.random() * 10);
+            var _chartData = {};
+            _chartData.labelArr = [];
+            _chartData.dataset = [];
+            console.log('_totalProductNum',_totalProductNum, 'totalMonths', totalMonths);
+            for(var i=0; i<_totalProductNum; i++) {
+                var _dataSet = {};
+                _dataSet.title = 'AWSDatabaseMigrationSvc' + (i + 1);
+                _dataSet.dataArr = [];
+                for(var j=0; j<totalMonths; j++){
+                    _dataSet.dataArr.push(Common.utils.rand(200, 500));
+                    if(_chartData.labelArr.length<totalMonths)_chartData.labelArr.push('2020.' + Common.utils.getPad((j+1), 2));
+                }
+                _chartData.dataset.push(_dataSet);
+            }
+            console.log(_chartData);
+            return _chartData;
+        };
+        // 데이터 통신 응답 data를 아래 Object로 변형해서 차트로 넘기면 됨.
+        // 현재 함수는 동적 데이터 생성.
+        /**
+         * {
+            labelArr : [],
+            dataset : [
+                {title: '', dataArr:[]},
+                {title: '', dataArr:[]}
+            ]
+            }
+         */
+        function reponseTotalSalesData(){
+            var _chartData = {};
+            _chartData.labelArr = [];
+            _chartData.dataset = [{title : '매출 합계', dataArr : []}];
+            for(var i=0; i<totalMonths; i++) {
+                _chartData.dataset[0].dataArr.push(Common.utils.rand(800, 1500));
+                _chartData.labelArr.push('2020.' + Common.utils.getPad((i+1), 2));
+            }
+            console.log(_chartData);
+            return _chartData;
+        };
+
+        // 각 버튼 정의
+        function setButtons(){
+            $('#monthlyRandom').on('click', function() {
+                chartObj.update(reponseByProductData(), reponseTotalSalesData());
+            });
+        };
+
+        function init(){
+            setButtons();
+            // 차트생성, 데이터 넣기.
+            chartObj = new chart.salesLineBarChart();
+            chartObj.init($('#chartContainer'), reponseByProductData(), reponseTotalSalesData());
+        };
+
+        window.onload = init;
+    </script>
+</body>
+</html>

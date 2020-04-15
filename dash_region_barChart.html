@@ -7,17 +7,22 @@
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
     <script src="./js/Chart.min.js"></script>
     <script src="./js/jquery-3.4.1.min.js"></script>
-    <script src="./js/utils.js"></script>
-    <script src="./js/dashBarChart.js"></script>
+    <script src="./js/utils.js?version=0.9"></script>
+    <script src="js/barChart.js?version=0.9"></script>
     <title>대시보드-지역별 이용현황 차트</title>
    </head>
 <body>
-<div style="height:193px; width:490px; border: 1px dashed #bcbcbc;">
-    <div id="" style="height:173px; width:490px;  overflow:auto;">
-        <div id="chartContainer" style="height:175px; width:490px; display: block">
+
+<div id="markup_area" style="height:193px; width:490px; border: 1px dashed #bcbcbc;">
+    <div id="" style="height:172px; width:490px;  overflow:auto;">
+        <div id="chartContainer" style="height:172px; width:490px; display: block">
         </div>
     </div>
-    <div id="axisContainer" style="height:20px; width:490px; display: block">
+    <div id="axisContainer" style="display:none; height:21px; width:490px;font-size: 14px; font-family:'Open Sans'; color:#777777">
+        <div id="leftDiv" style="height:21px;width:1%; float:left;"></div>
+        <div style="width:33%; float:left; padding-top:3px; border-top:1px solid #d1d5da;">0%</div>
+        <div style="width:33%; float:left; padding-top:3px; text-align: center; border-top:1px solid #d1d5da;">50%</div>
+        <div style="width:33%; float:left; padding-top:3px; text-align: right; border-top:1px solid #d1d5da;">100%</div>
     </div>
 </div>
 <br>
@@ -26,28 +31,30 @@
     <script>
         var chartObj = null;
 
-        // 통신 응답 data 가공.
-        // 아래 Object로 변형해서 차트로 넘기면 됨.
-        // return {labelArr:[], perArr:[], priceArr:[]}
+        // 데이터 통신 응답 data를 아래 Object로 변형해서 차트로 넘기면 됨.
+        // 현재 함수는 동적 데이터 생성.
+        /**
+         * {
+            labelArr : [],
+            dataset : [
+                {title: '', dataArr:[]}
+            ]
+        }
+         */
         function reponseData(){
-            var totalDataNum = 5 + Math.round(Math.random() * 15);
-            var totalPrice = 0;
-            var chartData = {};
-            chartData.labelArr = [];
-            chartData.perArr = [];
-            chartData.priceArr = [];
-            for(var i=0; i<totalDataNum; i++) {
-                chartData.labelArr.push('Country' + (i + 1));
-                chartData.priceArr.push(Common.utils.rand(0, 500));
-                totalPrice += chartData.priceArr[i];
+            var _totalNum = 5 + Math.round(Math.random() * 13);
+            var _chartData = {};
+            _chartData.labelArr = [];
+            _chartData.dataset = [{title : '', dataArr : []}];
+            for(var i=0; i<_totalNum; i++) {
+                _chartData.dataset[0].dataArr.push(Common.utils.rand(0, 500));
+                _chartData.labelArr.push('Country'+(i+1));
             }
-            for(var j=0; j<totalDataNum; j++) {
-                chartData.perArr.push(Math.round((chartData.priceArr[j]/totalPrice)*100));
-            }
-            return chartData;
+            console.log(_chartData);
+            return _chartData;
         };
 
-        // 필요 없는 부분
+        // 각 버튼 정의
         function setButtons(){
             $('#randomizeData').on('click', function() {
                 chartObj.update(reponseData());
@@ -56,7 +63,7 @@
 
         function init(){
             setButtons();
-            chartObj = new chart.dashLineChart();
+            chartObj = new chart.barChart();
             chartObj.init($('#chartContainer'), reponseData(),$('#axisContainer'));
         };
 

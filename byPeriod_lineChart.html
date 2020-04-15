@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="./css/Chart.css">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+    <script src="./js/Chart.min.js"></script>
+    <script src="./js/jquery-3.4.1.min.js"></script>
+    <script src="./js/utils.js?version=0.9"></script>
+    <script src="./js/byPeriodLineChart.js?version=0.9"></script>
+    <title>대시보드-이용금액 라인차트</title>
+</head>
+<body>
+<div id="chartContainer" class="chart-container" style="height:268px; width:100%;border: 1px dashed #bcbcbc;">
+</div>
+<br>
+<br>
+<button id="monthlyRandom">월별 이용금액</button>
+<button id="weeklyRandom">주별 이용금액</button>
+<button id="dailyRandom">일별 이용금액</button>
+    <script>
+        var chartObj = null;
+        // 데이터 통신 응답 data를 아래 Object로 변형해서 차트로 넘기면 됨.
+        // 현재 함수는 동적 데이터 생성.
+        /**
+         * {
+            labelArr : [],
+            dataset : [
+                {title: '', dataArr:[]},
+                {title: '', dataArr:[]},
+                {title: '', dataArr:[]}
+            ]
+            }
+         */
+        function reponseMonthlyData(){
+            var _totalDays = 1 + Math.round(Math.random() * 23);
+            var _chartData = {};
+            _chartData.labelArr = [];
+            _chartData.dataset = [{title : '', dataArr : []}];
+            for(var i=0; i<_totalDays; i++) {
+                _chartData.dataset[0].dataArr.push(Common.utils.rand(4000, 5000));
+                _chartData.labelArr.push('2020.' + Common.utils.getPad((i+1), 2));
+            }
+            console.log(_chartData);
+            return _chartData;
+        };
+
+        // 데이터 통신 응답 data를 아래 Object로 변형해서 차트로 넘기면 됨.
+        // 현재 함수는 동적 데이터 생성.
+        /**
+         * {
+            labelArr : [],
+            dataset : [
+                {title: '', dataArr:[]},
+                {title: '', dataArr:[]},
+                {title: '', dataArr:[]}
+            ]
+            }
+         */
+        function reponseWeeklyData(){
+            var _totalNum = 1 + Math.round(Math.random() * 4);
+            var _chartData = {};
+            _chartData.labelArr = ['월요일','화요일','수요일','목요일','금요일','토요일','일요일'];
+            _chartData.dataset = [];
+            for(var i=0; i<_totalNum; i++) {
+                var _dataSet = {};
+                _dataSet.title = '3월 ' + (i + 1) + '째주';
+                _dataSet.dataArr = [];
+                for(var j=0; j<7; j++){
+                    _dataSet.dataArr.push(Common.utils.rand(4000, 5000));
+                }
+                _chartData.dataset.push(_dataSet);
+            }
+            console.log(_chartData);
+            return _chartData;
+        };
+
+        // 데이터 통신 응답 data를 아래 Object로 변형해서 차트로 넘기면 됨.
+        // 현재 함수는 동적 데이터 생성.
+        /**
+         * {
+            labelArr : [],
+            dataset : [
+                {title: '', dataArr:[]},
+                {title: '', dataArr:[]},
+                {title: '', dataArr:[]}
+            ]
+            }
+         */
+        function reponseDailyData(){
+            var _totalNum = 20 + Math.round(Math.random() * 11);
+            var _totaldataNum = 2 + Math.round(Math.random() * 10);
+            var _chartData = {};
+            _chartData.labelArr = [];
+            _chartData.dataset = [];
+            for(var i=0; i<_totaldataNum; i++) {
+                var _dataSet = {};
+                _chartData.labelArr.push('03/'+Common.utils.getPad((i+1),2));
+                _dataSet.title = 'AWSDataTransfer' + (i + 1);
+                _dataSet.dataArr = [];
+                for(var j=0; j<_totalNum; j++){
+                    _dataSet.dataArr.push(Common.utils.rand(1, 100));
+                }
+                _chartData.dataset.push(_dataSet);
+            }
+            console.log(_chartData);
+            return _chartData;
+        };
+
+        // 각 버튼 정의
+        function setButtons(){
+            $('#monthlyRandom').on('click', function() {
+                chartObj.update(reponseMonthlyData());
+            });
+            $('#weeklyRandom').on('click', function() {
+                chartObj.update(reponseWeeklyData());
+            });
+            $('#dailyRandom').on('click', function() {
+                chartObj.update(reponseDailyData());
+            });
+        };
+
+        function init(){
+            setButtons();
+            // 차트생성, 데이터 넣기.
+            chartObj = new chart.byPeriodLineChart();
+            chartObj.init($('#chartContainer'), reponseWeeklyData());
+        };
+
+        window.onload = init;
+    </script>
+</body>
+</html>

@@ -1,42 +1,72 @@
 var chart = chart || {};
-
+//@todo 최소값 잡히게 하기.
+//@todo 다른 차트 검수 완료 하기.
 (function() {
-    chart.dashLineChart = function () {
-        //@todo 3. 툴팁 label 한픽셀 위로
+    chart.barChart = function () {
         var containerObj = null;
         var axisContainerObj = null;
         var chartObj = null;
         var config = null;
         var labelArr = [];
-        var priceArr = [];
         var perArr = [];
-        var standColor = ['#0078ee', '#f9bc5f'];
-        var colorsArr = [];
+        var priceArr = [];
+        var chartColors = ['#0078ee', '#f9bc5f'];
         var recreateBln = false;
 
         // API 에서 받은 데이터를 Chart에 넣을 데이터로 변환.
         function parseData(dataObj){
-            labelArr = dataObj.labelArr;
-            perArr = dataObj.perArr;
-            priceArr = dataObj.priceArr;
-            colorsArr = [];
-            var _totalNum = labelArr.length;
-            for(var i=0; i<_totalNum; i++) {
-                colorsArr.push(standColor[i%standColor.length]);
-            }
-        };
+            var _totalNum = dataObj.dataset.length;
+            var _totalLableNum = dataObj.dataset[0].dataArr.length;
+            var _totalPrice = 0;
+            var _colorArr = [];
+            var _maxVal = 0;
 
+            dataSetsArr = [];
+            labelArr = dataObj.labelArr;
+            priceArr = dataObj.dataset[0].dataArr;
+            perArr = [];
+
+            // 컬러 세팅
+            for(var i=0; i<labelArr.length; i++) {
+                if(i<chartColors.length){
+                    _colorArr.push(chartColors[i%chartColors.length]);
+                }else{
+                    _colorArr.push(Common.utils.getRandomColor());
+                }
+            }
+
+            // 전체합을 100% 기준으로
+            // for(var j=0; j<_totalLableNum; j++) {
+            //     _totalPrice += dataObj.dataset[0].dataArr[j];
+            // }
+            // for(var k=0; k<_totalLableNum; k++) {
+            //     perArr.push(Math.round((dataObj.dataset[0].dataArr[k]/_totalPrice)*100));
+            // }
+
+            // 가장 큰값을 100% 기준으로
+            _maxVal = Math.max.apply(null, priceArr);
+            for(var k=0; k<_totalLableNum; k++) {
+                perArr.push(Math.round((dataObj.dataset[0].dataArr[k]/_maxVal)*100));
+            }
+
+            // 데이터 세팅.
+            for(var i = 0; i < _totalNum; i++){
+                var _item = {
+                    data: perArr,//dataObj.dataset[i].dataArr,
+                    backgroundColor : _colorArr,
+                    barThickness: 12
+                }
+                dataSetsArr.push(_item);
+            }
+
+        };
         // 속성 정의
         function setChartConfig(axisVisible){
             config = {
                 type: 'horizontalBar',
                 data: {
                     labels: labelArr,
-                    datasets: [{
-                        backgroundColor: colorsArr,
-                        barThickness: 12,
-                        data: perArr
-                    }]
+                    datasets: dataSetsArr
                 },
                 options: {
                     cornerRadius: 10,
@@ -46,8 +76,6 @@ var chart = chart || {};
                     },
                     tooltips: {
                         backgroundColor: '#15283b',
-                        yAlign: 'bottom',
-                        xAlign: 'center',
                         bodyAlign: 'center',
                         bodyFontSize: 12,
                         cornerRadius: 15,
@@ -57,32 +85,15 @@ var chart = chart || {};
                             if (!tooltip) {return};
                             // 툴팁에 앞 박스 안나오게
                             tooltip.displayColors = false;
-                            // 툴팁 masking 되는거 패칭
-                            if(tooltip.y < 0){
-                                tooltip.yAlign = 'top';
-                                tooltip.y = tooltip.y + tooltip.height + (tooltip.height/2);
-                            }else{
-                                tooltip.yAlign = 'bottom';
-                            }
-                            // if(tooltip.x >= containerObj.width()){
-                            //     tooltip.xAlign = 'left';
-                            //     tooltip.yAlign = 'center';
-                            //     tooltip.x = 10;//containerObj.width() - tooltip.width;
-                            // }else{
-                            //     tooltip.xAlign = 'center';
-                            //     tooltip.yAlign = 'bottom';
-                            //     tooltip.x = 10;
-                            // }
                         },
                         callbacks: {
                             title: function(tooltipItem, data) {
                                 return '';
                             },
                             label: function(tooltipItem, data) {
-                                var price = priceArr[tooltipItem.index] || '';
-
-                                price = Math.round(price * 100) / 100;
-                                return '$'+price+' ('+perArr[tooltipItem.index]+'%)';
+                                var _price = priceArr[tooltipItem.index] || '';
+                                _price = Math.round(_price * 100) / 100;
+                                return '$'+_price+' ('+perArr[tooltipItem.index]+'%)';
                             },
                             labelTextColor: function(tooltipItem, chart) {
                                 return '#ffffff';
@@ -140,75 +151,39 @@ var chart = chart || {};
             containerObj = containerEl;
             axisContainerObj = axisEl;
             containerObj.append('<canvas style="z-index: -1"></canvas>');
-            axisContainerObj.append('<canvas></canvas>');
         };
 
+        // 차트가 다 그려질때, 그려지고 있을때 리스너
         function copyAxis(){
             var _animation = {
                 onComplete: function () {
-
+                    axisContainerObj.show();
+                    resizeXAxisWidth();
                 },
                 onProgress: function () {
-                    createXAxis();
                 }
             }
             return _animation;
         };
 
-        // 차트 컨테이너 리자이즈.
-        function resizeContainer(){
-            var _tarHeight = (labelArr.length * 34) + 3;
-            containerObj.height(_tarHeight);
-        };
-
-        // 차트(x축 포함) 생성
-        function createChartWithXaxis(){
-            setChartConfig(true);
-            if(chartObj){
-                chartObj.destroy();
-            }
-            chartObj = new Chart(containerObj.children('canvas'), config);
+        // X축 Div 위치 갱신.
+        function resizeXAxisWidth() {
+            var _yAXisW = chartObj.scales['y-axis-0'].width;
+            var _tarW = (axisContainerObj.width() - _yAXisW) / 3;
+            axisContainerObj.children('#leftDiv').width(_yAXisW);
+            $(axisContainerObj.find('div')[1]).width(_tarW);
+            $(axisContainerObj.find('div')[2]).width(_tarW);
+            $(axisContainerObj.find('div')[3]).width(_tarW);
         };
 
         // 차트 X 축 제거 후 차트 재생성
         function recreateChartWithoutXaxis(){
-            chartObj.destroy();
+            if(chartObj)chartObj.destroy();
             setChartConfig(false);
             chartObj = new Chart(containerObj.children('canvas'), config);
         };
 
-        // X축 canvas로 복사하여 동적 생성.
-        function createXAxis(){
-            if (!recreateBln) {
-                var _scale = window.devicePixelRatio;
-                var sourceCanvas = chartObj.chart.canvas;
-                var copyWidth = chartObj.width;
-                var copyHeight = 30;
-                var startPoX = 0;
-                var startPoY = chartObj.height - copyHeight;
-                var targetCtx = axisContainerObj.children('canvas')[0].getContext("2d");
-                var scaledWidth = copyWidth * _scale;
-                var scaledHeight = copyHeight * _scale;
-
-                targetCtx.scale(_scale, _scale);
-                targetCtx.canvas.width = scaledWidth;
-                targetCtx.canvas.height = scaledHeight;
-                targetCtx.canvas.style.width = `${copyWidth}px`;
-                targetCtx.canvas.style.height = `${copyHeight}px`;
-                targetCtx.beginPath();       // Start a new path
-                targetCtx.moveTo(chartObj.scales['y-axis-0'].width , 0);    // Move the pen to (30, 50)
-                targetCtx.lineTo(scaledWidth, 0);  // Draw a line to (150, 100)
-                targetCtx.strokeStyle = "#d1d5da";
-                targetCtx.stroke();          // Render the path
-
-                targetCtx.drawImage(sourceCanvas, startPoX, startPoY, scaledWidth, scaledHeight,
-                    0, 0, scaledWidth, scaledHeight);
-                recreateBln = true;
-                recreateChartWithoutXaxis();
-            }
-        };
-
-        /**Customize the Rectangle.prototype draw method**/
+        /* 바 모양 라운딩으로 커스텀*/
         Chart.elements.Rectangle.prototype.draw = function() {
             var ctx = this._chart.ctx;
             var vm = this._view;
@@ -470,13 +445,18 @@ var chart = chart || {};
             }
         };
 
+        // 차트 컨테이너 리자이즈.
+        function resizeContainer(){
+            var _tarHeight = (labelArr.length * 34) + 3;
+            containerObj.height(_tarHeight);
+        };
 
         // public 업데이트
         this.update = function(chartData){
             recreateBln = false;
             parseData(chartData);
             resizeContainer();
-            createChartWithXaxis();
+            recreateChartWithoutXaxis();
         };
 
         // public 초기화
@@ -484,7 +464,7 @@ var chart = chart || {};
             createCanvas(containerEl, axisEl);
             parseData(chartData);
             resizeContainer();
-            createChartWithXaxis();
+            recreateChartWithoutXaxis();
             Chart.defaults.global.defaultFontFamily = 'Open Sans';
         };
     }

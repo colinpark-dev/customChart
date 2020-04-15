@@ -9,7 +9,7 @@
     <script src="./js/Chart.min.js"></script>
     <script src="./js/jquery-3.4.1.min.js"></script>
     <script src="./js/utils.js"></script>
-    <script src="./js/dashDoughnutChart.js"></script>
+    <script src="js/doughnutChart.js?version=0.91"></script>
     <title>대시보드-상품별 도넛차트</title>
 </head>
 <body>
@@ -30,28 +30,30 @@
 
     var chartObj = null;
 
-    // 통신 응답 data 가공.
-    // 아래 Object로 변형해서 차트로 넘기면 됨.
-    // return {labelArr:[], perArr:[], priceArr:[]}
+    // 데이터 통신 응답 data를 아래 Object로 변형해서 차트로 넘기면 됨.
+    // 현재 함수는 동적 데이터 생성.
+    /**
+     * {
+            labelArr : [],
+            dataset : [
+                {title: '', dataArr:[]}
+            ]
+        }
+     */
     function reponseData(){
-        var totalDataNum = 2 + Math.round(Math.random() * 13);
-        var totalPrice = 0;
-        var chartData = {};
-        chartData.labelArr = [];
-        chartData.perArr = [];
-        chartData.priceArr = [];
-        for(var i=0; i<totalDataNum; i++) {
-            chartData.labelArr.push('AWSDatabaseMigrationSvc'+(i+1));
-            chartData.priceArr.push(Common.utils.rand(100, 200));
-            totalPrice += chartData.priceArr[i];
+        var _totalNum = 5 + Math.round(Math.random() * 13);
+        var _chartData = {};
+        _chartData.labelArr = [];
+        _chartData.dataset = [{title : '', dataArr : []}];
+        for(var i=0; i<_totalNum; i++) {
+            _chartData.dataset[0].dataArr.push(Common.utils.rand(100, 400));
+            _chartData.labelArr.push('AWSDatabaseMigrationSvc'+(i+1));
         }
-        for(var j=0; j<totalDataNum; j++) {
-            chartData.perArr.push(Math.round((chartData.priceArr[j]/totalPrice)*100));
-        }
-        return chartData;
+        console.log(_chartData);
+        return _chartData;
     };
 
-    // 필요 없는 부분
+    // 각 버튼 정의
     function setButtons(){
         $('#randomizeData').on('click', function() {
             chartObj.update(reponseData());
@@ -62,7 +64,7 @@
         setButtons();
 
         // 차트 인스턴스 생성
-        chartObj = new chart.dashDoughnutChart();
+        chartObj = new chart.doughnutChart();
         // 차트가 만들어질 div 객체, data를 넘겨줌
         chartObj.init($('#chartContainer'), reponseData(), $('#doughnutLegend'));
         //setLegend();

@@ -1,44 +1,60 @@
 var chart = chart || {};
 
 (function() {
-    chart.dashLineChart = function () {
+    chart.byPeriodLineChart = function () {
         var chartObj = null;
         var config = null;
         var labelArr = [];
-        var priceArr = [];
-        var dateArr = [];
-
-        // API 에서 받은 데이터를 Chart에 넣을 데이터로 변환.
-        // function parseData(dataObj){
-        //     labelArr = [];
-        //     dateArr = dataObj.dateArr;
-        //     priceArr = dataObj.priceArr;
-        //     var _totalDays = Common.utils.getDays(dataObj.year,dataObj.month);
-        //     for(var i=0; i<_totalDays; i++) {
-        //         labelArr.push('Day'+(i+1));
-        //     }
-        // };
+        var dataSetsArr = [];
+        var legendBln = false;
+        var chartColors = [
+            '#394cb1',
+            '#0078ee',
+            '#15d4a9',
+            '#f9bc5f',
+            '#f98e5f',
+            '#fd4d4d',
+            '#b5e021',
+            '#b139ad',
+            '#00e6ee',
+            '#6639b1',
+            '#e83a3a',
+            '#27ce66',
+            '#f26a57',
+            '#4139b1',
+            '#e9e222',
+            '#40e021',
+            '#8239b1',
+            '#d3249f',
+            '#00aeee'
+        ];
 
         // API 에서 받은 데이터를 Chart에 넣을 데이터로 변환.
         function parseData(dataObj){
             var _totalNum = dataObj.dataset.length;
+            var _color = null;
             dataSetsArr = [];
-            labelArr = [];
-            dateArr = dataObj.labelArr;
+            labelArr = dataObj.labelArr;
             for(var i = 0; i < _totalNum; i++){
+                if(i<chartColors.length){
+                    _color = chartColors[i];
+                }else{
+                    _color = Common.utils.getRandomColor();
+                }
                 var _item = {
-                    fill : false,
+                    label: dataObj.dataset[i].title,
                     data: dataObj.dataset[i].dataArr,
-                    borderColor: '#0078ee',
-                    borderWidth: 3,
-                    pointBackgroundColor : '#0078ee'
+                    fill : false,
+                    borderColor: _color,
+                    pointBackgroundColor : chartColors[i],
+                    borderWidth: 3
                 }
                 dataSetsArr.push(_item);
             }
-
-            var _totalDays = Common.utils.getDays(dataObj.year,dataObj.month);
-            for(var i=0; i<_totalDays; i++) {
-                labelArr.push('Day'+(i+1));
+            if(_totalNum === 1){
+                legendBln = false;
+            }else{
+                legendBln = true;
             }
         };
 
@@ -54,13 +70,13 @@ var chart = chart || {};
                 options: {
                     maintainAspectRatio: false,
                     legend: { //범례
-                        display: false,
+                        display: legendBln,
                     },
                     tooltips: {
                         mode: 'index',
                         intersect: false, // 그리드라인 오버시 툴팁 나오게
                         backgroundColor: '#15283b',
-                        yAlign: 'top',
+                        yAlign: 'bottom',
                         xAlign: 'center',
                         bodyAlign: 'center',
                         bodyFontSize: 12,
@@ -71,16 +87,20 @@ var chart = chart || {};
                             if (!tooltip) {return}
                             // 툴팁에 앞 박스 안나오게
                             tooltip.displayColors = false;
+                            // 툴팁 masking 되는거 패칭
+                            if(tooltip.y < 0){
+                                tooltip.y = 0;
+                            }
                         },
                         callbacks: {
                             title: function() {
                                 return '';
                             },
                             label: function(tooltipItem, data) {
-                                var label =
-                                    data.datasets[tooltipItem.datasetIndex].label ||
-                                    Math.round(tooltipItem.yLabel * 100) / 100;
-                                return dateArr[tooltipItem.index]+'  $'+label;
+                                var _label = data.datasets[tooltipItem.datasetIndex].label
+                                var _data = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                _data = Math.round(_data * 100) / 100;
+                                return _label + '  $' + _data;
                             },
                             labelTextColor: function() {
                                 return '#ffffff';
@@ -99,25 +119,6 @@ var chart = chart || {};
                                 fontSize : 14,
                                 padding : 10,
                                 beginAtZero: true,
-                                maxRotation: 0,
-                                // X축 Label 10개 단위로 나오게
-                                callback: function(dataLabel, index, data) {
-                                    var period = Math.round(data.length/10);
-                                    var returnLabel = (index+1) % 10 === 0 ? dataLabel : '';
-                                    // 말일이 10으로 안떨어지는 달
-                                    // 말일이 10으로 나눈 초과일떄,
-                                    if(data.length > period*10){
-                                        if(Number(index+1)===period*10) {returnLabel = ''}
-                                        if(Number(index+1)===data.length) {returnLabel = dataLabel}
-                                    }else{
-                                        // 10으로 나눈 미만일대,
-                                        if(Number(index+1)===data.length){
-                                            returnLabel = dataLabel;
-                                        }
-                                    }
-                                    if(index===0){returnLabel = dataLabel}
-                                    return returnLabel;
-                                }
                             }
                         }],
                         yAxes: [{
@@ -129,8 +130,8 @@ var chart = chart || {};
                             ticks: {
                                 fontSize : 14,
                                 padding : 11,
-                                beginAtZero: true,
-                                stepSize : 50,
+                                // beginAtZero: true,
+                                // stepSize : 50,
                                 callback: function(dataLabel, index) {
                                     // Hide the label of every 2nd dataset. return null to hide the grid line too
                                     return index % 2 === 0 ? dataLabel : '';
@@ -174,6 +175,7 @@ var chart = chart || {};
             parseData(chartData);
             config.data.labels = labelArr;
             config.data.datasets = dataSetsArr;
+            config.options.legend.display = legendBln;
             chartObj.update();
         };
 
